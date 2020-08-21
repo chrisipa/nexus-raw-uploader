@@ -30,7 +30,7 @@ Installation
 * Download nexus-repository-folder-uploader script to `/usr/local/bin` folder:
 
    ```
-   sudo wget https://raw.githubusercontent.com/chrisipa/nexus-repository-folder-uploader/master/nexus-repository-folder-uploader -O /usr/local/bin/ansible-playbook-wrapper
+   sudo wget https://raw.githubusercontent.com/chrisipa/nexus-repository-folder-uploader/master/nexus-repository-folder-uploader -O /usr/local/bin/nexus-repository-folder-uploader
    ```
    
 * Make nexus-repository-folder-uploader script executable:   
