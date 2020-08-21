@@ -3,23 +3,23 @@
 Overview
 --------
 Simple bash script to recursively upload local folders to a Nexus Repository Manager server:
-    ```
-    ####################################
-    # Nexus Repository Folder Uploader #
-    ####################################
+   ```
+   ####################################
+   # Nexus Repository Folder Uploader #
+   ####################################
 
-    Usage:
-    nexus-repository-folder-uploader [Options] <Args>
-    Required options:
-    -u <username>         Username of the nexus repository manager server
-    -p <password>         Password of the nexus repository manager server
-    -f <folder path>      Path of the local folder to upload
-    -n <nexus url>        URL of the nexus repository manager server
-    -r <repo name>        Name of the repository to upload the files
-    -h                    Show this help text
-    Example:
-    nexus-repository-folder-uploader -u my-username -p my-password -f /my/folder/path/to/upload -n http://my-nexus-url:8081 -r my-repo-name
-    ```
+   Usage:
+     nexus-repository-folder-uploader [Options] <Args>
+   Required options:
+     -u <username>         Username of the nexus repository manager server
+     -p <password>         Password of the nexus repository manager server
+     -f <folder path>      Path of the local folder to upload
+     -n <nexus url>        URL of the nexus repository manager server
+     -r <repo name>        Name of the repository to upload the files
+     -h                    Show this help text
+   Example:
+     nexus-repository-folder-uploader -u my-username -p my-password -f /my/folder/path/to/upload -n http://my-nexus-url:8081 -r my-repo-name
+   ```
 
 Prerequisites
 -------------
