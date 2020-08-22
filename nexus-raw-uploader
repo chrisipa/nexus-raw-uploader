@@ -57,7 +57,7 @@ Usage:
 
 Required options:
   -u <username>     Username of the nexus repository manager server
-  -l <local path>   The local path to upload (can be a file or folder)
+  -l <local path>   The local path to upload (can be a file or folder, must start with '/')
   -r <repo name>    Name of the repository to upload the files
   -n <nexus url>    URL of the nexus repository manager server
 
@@ -132,6 +132,26 @@ if ([ "$username" == "" ] || [ "$localPath" == "" ] || [ "$nexusUrl" == "" ] || 
 then
     # print usage
     usage
+fi
+
+# check if local path starts with slash
+if [ "$localPath" != "" ]
+then
+    if (! [[ $localPath == /* ]])
+    then
+        log "ERROR" "The local path must start with a '/'"
+        exit -1
+    fi
+fi
+
+# check if target path starts with slash
+if [ "$targetPath" != "" ]
+then
+    if (! [[ $targetPath == /* ]])
+    then
+        log "ERROR" "The target path must start with a '/'"
+        exit -1
+    fi
 fi
 
 # read password from command line

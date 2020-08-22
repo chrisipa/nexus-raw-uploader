@@ -13,7 +13,7 @@ Simple bash script to upload local files or folders to a Nexus Repository Manage
    
    Required options:
      -u <username>     Username of the nexus repository manager server
-     -l <local path>   The local path to upload (can be a file or folder)
+     -l <local path>   The local path to upload (can be a file or folder, must start with '/')
      -r <repo name>    Name of the repository to upload the files
      -n <nexus url>    URL of the nexus repository manager server
    
