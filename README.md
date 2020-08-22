@@ -1,24 +1,32 @@
-# nexus-repository-folder-uploader
+# nexus-raw-uploader
 
 Overview
 --------
-Simple bash script to recursively upload local folders to a Nexus Repository Manager server:
+Simple bash script to upload local files or folders to a Nexus Repository Manager server:
    ```
-   ####################################
-   # Nexus Repository Folder Uploader #
-   ####################################
-
+   #################################
+   # Nexus RAW Repository Uploader #
+   #################################
+   
    Usage:
-     nexus-repository-folder-uploader [Options] <Args>
+     nexus-raw-uploader [Options] <Args>
+   
    Required options:
-     -u <username>         Username of the nexus repository manager server
-     -p <password>         Password of the nexus repository manager server
-     -f <folder path>      Path of the local folder to upload
-     -n <nexus url>        URL of the nexus repository manager server
-     -r <repo name>        Name of the repository to upload the files
-     -h                    Show this help text
-   Example:
-     nexus-repository-folder-uploader -u my-username -p my-password -f /my/folder/path/to/upload -n http://my-nexus-url:8081 -r my-repo-name
+     -u <username>     Username of the nexus repository manager server
+     -l <local path>   The local path to upload (can be a file or folder)
+     -r <repo name>    Name of the repository to upload the files
+     -n <nexus url>    URL of the nexus repository manager server
+   
+   Not required options:
+     -p <password>     Password of the nexus repository manager server (will be asked if not present)
+     -t <target path>  The target path to upload to (default is empty, must start with '/')
+     -h                Show this help text
+   
+   Examples:
+     nexus-raw-uploader -u 'my-username' -l '/my/local/file/path' -r my-repo-name -n http://my-nexus-url
+     nexus-raw-uploader -u 'my-username' -l '/my/local/file/path' -t '/my/target/folder/path' -r my-repo-name -n http://my-nexus-url
+     nexus-raw-uploader -u 'my-username' -l '/my/local/folder/path' -r my-repo-name -n http://my-nexus-url
+     nexus-raw-uploader -u 'my-username' -l '/my/local/folder/path' -t '/my/target/folder/path' -r my-repo-name -n http://my-nexus-url
    ```
 
 Prerequisites

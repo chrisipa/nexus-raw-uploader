@@ -1,0 +1,174 @@
+#!/bin/bash
+
+#############
+# FUNCTIONS #
+#############
+
+# --------------------------------------------------------
+# Function for creating log entries on the console
+# --------------------------------------------------------
+# $1 - Log level
+# $2 - Log text
+# --------------------------------------------------------
+function log() {
+
+    # read parameters
+    local level="$1"
+    local text="$2"
+
+    # create log message
+    local now=$(date +"%d-%m-%Y %H:%M:%S")
+    echo -e "\n$now [$level] $text\n"
+}
+
+# --------------------------------------------------------
+# Function to upload a file to nexus repository manager
+# --------------------------------------------------------
+# $1 - Username
+# $2 - Password
+# $3 - File path
+# $4 - Nexus upload URL
+# --------------------------------------------------------
+function uploadFile() {
+
+    # read parameters
+    local username="$1"
+    local password="$2"
+    local filePath="$3"
+    local nexusUploadUrl="$4"
+
+    # get file name
+    fileName="$(basename $filePath)"
+
+    # upload file to nexus repository manager server
+    log "info" "Uploading file '$fileName' to URL '$nexusUploadUrl'"
+    curl -u "$username:$password" --upload-file "$filePath" "$nexusUploadUrl"
+}
+
+# ---------------------------------------------------------------
+# Function for printing the usage of this script
+# ---------------------------------------------------------------
+function usage() {
+
+    # print help text
+    cat <<USAGE
+Usage:
+  $scriptName [Options] <Args>
+
+Required options:
+  -u <username>     Username of the nexus repository manager server
+  -l <local path>   The local path to upload (can be a file or folder)
+  -r <repo name>    Name of the repository to upload the files
+  -n <nexus url>    URL of the nexus repository manager server
+
+Not required options:
+  -p <password>     Password of the nexus repository manager server (will be asked if not present)
+  -t <target path>  The target path to upload to (default is empty, must start with '/')
+  -h                Show this help text
+
+Examples:
+  $scriptName -u 'my-username' -l '/my/local/file/path' -r my-repo-name -n http://my-nexus-url
+  $scriptName -u 'my-username' -l '/my/local/file/path' -t '/my/target/folder/path' -r my-repo-name -n http://my-nexus-url
+  $scriptName -u 'my-username' -l '/my/local/folder/path' -r my-repo-name -n http://my-nexus-url
+  $scriptName -u 'my-username' -l '/my/local/folder/path' -t '/my/target/folder/path' -r my-repo-name -n http://my-nexus-url
+USAGE
+
+    # exit with error
+    exit -1
+}
+
+
+##########
+# SCRIPT #
+##########
+
+# echo script banner
+echo ""
+echo "#################################"
+echo "# Nexus RAW Repository Uploader #"
+echo "#################################"
+echo ""
+
+# get script folder
+scriptPath="$(readlink -f $0)"
+scriptFolder="$(dirname $scriptPath)"
+scriptName="$(basename $scriptPath)"
+
+# get command line args
+while getopts u:p:l:t:n:r:h opt
+do
+    case $opt in
+        u)
+            username="$OPTARG"
+        ;;
+        p)
+            password="$OPTARG"
+        ;;
+        l)
+            localPath="$OPTARG"
+        ;;
+        t)
+            targetPath="$OPTARG"
+        ;;
+        n)
+            nexusUrl="$OPTARG"
+        ;;
+        r)
+            repositoryName="$OPTARG"
+        ;;
+        h)
+            usage
+            exit -1
+        ;;
+        \?)
+            log "ERROR" "Invalid option: -$OPTARG"
+            exit -1
+        ;;
+    esac
+done
+
+# check if all necessary parameter exist
+if ([ "$username" == "" ] || [ "$localPath" == "" ] || [ "$nexusUrl" == "" ] || [ "$repositoryName" == "" ])
+then
+    # print usage
+    usage
+fi
+
+# read password from command line
+if [ "$password" == "" ]
+then 
+    read -s -p "Password: " password
+    echo ""
+fi
+
+# if local path is a single file
+if [ -f "$localPath" ]
+then
+    # get file name
+    fileName=$(basename $localPath)
+
+    # get upload url
+    nexusUploadUrl="${nexusUrl}/repository/${repositoryName}${targetPath}/$fileName"
+
+    # upload file to nexus repository manager server
+    uploadFile "$username" "$password" "$localPath" "$nexusUploadUrl"
+else
+    # if local path is a folder
+    if [ -d "$localPath" ]
+    then
+        find "$localPath" -name '*' -type f | while read filePath
+        do 
+            # get file name
+            fileName=$(basename $filePath)
+
+            # get relative path to file
+            relativePath="$(echo $filePath | sed -r "s|$localPath||g")"
+
+            # get upload url
+            nexusUploadUrl="${nexusUrl}/repository/${repositoryName}${targetPath}${relativePath}"
+
+            # upload file to nexus repository manager server
+            uploadFile "$username" "$password" "$filePath" "$nexusUploadUrl"    
+        done
+    fi
+fi
