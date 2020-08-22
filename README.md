@@ -35,14 +35,14 @@ Prerequisites
 
 Installation
 ------------
-* Download nexus-repository-folder-uploader script to `/usr/local/bin` folder:
+* Download nexus-raw-uploader script to `/usr/local/bin` folder:
 
    ```
-   sudo wget https://raw.githubusercontent.com/chrisipa/nexus-repository-folder-uploader/master/nexus-repository-folder-uploader -O /usr/local/bin/nexus-repository-folder-uploader
+   sudo wget https://raw.githubusercontent.com/chrisipa/nexus-raw-uploader/master/nexus-raw-uploader -O /usr/local/bin/nexus-raw-uploader
    ```
    
-* Make nexus-repository-folder-uploader script executable:   
+* Make nexus-raw-uploader script executable:   
 
    ```
-   sudo chmod +x /usr/local/bin/nexus-repository-folder-uploader
+   sudo chmod +x /usr/local/bin/nexus-raw-uploader
    ```
