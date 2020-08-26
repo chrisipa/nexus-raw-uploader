@@ -2,7 +2,7 @@
 
 Overview
 --------
-Simple bash script to upload local files or folders to a Nexus Repository Manager server:
+Simple bash script to upload local files or folders to a Nexus RAW Repository:
    ```
    #################################
    # Nexus RAW Repository Uploader #
