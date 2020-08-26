@@ -22,27 +22,62 @@ function log() {
 }
 
 # --------------------------------------------------------
+# Function to url encode a string
+# --------------------------------------------------------
+# $1 - String
+# --------------------------------------------------------
+function urlEncode() {
+
+    local old_lc_collate=$LC_COLLATE
+    LC_COLLATE=C
+
+    local length="${#1}"
+    for (( i = 0; i < length; i++ )); do
+        local c="${1:$i:1}"
+        case $c in
+            [a-zA-Z0-9.~_-]) printf '%s' "$c" ;;
+            *) printf '%%%02X' "'$c" ;;
+        esac
+    done
+
+    LC_COLLATE=$old_lc_collate
+}
+
+# --------------------------------------------------------
 # Function to upload a file to nexus repository manager
 # --------------------------------------------------------
 # $1 - Username
 # $2 - Password
-# $3 - File path
-# $4 - Nexus upload URL
+# $3 - Local path
+# $4 - Remote path
+# $5 - Repository name
+# $6 - Nexus URL
 # --------------------------------------------------------
 function uploadFile() {
 
     # read parameters
     local username="$1"
     local password="$2"
-    local filePath="$3"
-    local nexusUploadUrl="$4"
+    local localPath="$3"
+    local remotePath="$4"
+    local repositoryName="$5"
+    local nexusUrl="$6"
 
     # get file name
-    fileName="$(basename $filePath)"
+    local fileName="$(basename "$localPath")"
+
+    # get nexus upload url
+    local nexusUploadUrl="${nexusUrl}/repository/${repositoryName}${remotePath}"
+
+    # get encoded remote path
+    local encodedRemotePath="$(urlEncode "$remotePath")"
+
+    # get encoded nexus upload url
+    local encodedNexusUploadUrl="${nexusUrl}/repository/${repositoryName}${encodedRemotePath}"
 
     # upload file to nexus repository manager server
     log "info" "Uploading file '$fileName' to URL '$nexusUploadUrl'"
-    curl -u "$username:$password" --upload-file "$filePath" "$nexusUploadUrl"
+    curl -u "$username:$password" --upload-file "$localPath" "$encodedNexusUploadUrl"
 }
 
 # ---------------------------------------------------------------
@@ -90,9 +125,9 @@ echo "#################################"
 echo ""
 
 # get script folder
-scriptPath="$(readlink -f $0)"
-scriptFolder="$(dirname $scriptPath)"
-scriptName="$(basename $scriptPath)"
+scriptPath="$(readlink -f "$0")"
+scriptFolder="$(dirname "$scriptPath")"
+scriptName="$(basename "$scriptPath")"
 
 # get command line args
 while getopts u:p:l:t:n:r:h opt
@@ -137,7 +172,7 @@ fi
 # check if local path starts with slash
 if [ "$localPath" != "" ]
 then
-    if (! [[ $localPath == /* ]])
+    if (! [[ "$localPath" == /* ]])
     then
         log "ERROR" "The local path must start with a '/'"
         exit -1
@@ -147,7 +182,7 @@ fi
 # check if target path starts with slash
 if [ "$targetPath" != "" ]
 then
-    if (! [[ $targetPath == /* ]])
+    if (! [[ "$targetPath" == /* ]])
     then
         log "ERROR" "The target path must start with a '/'"
         exit -1
@@ -165,30 +200,27 @@ fi
 if [ -f "$localPath" ]
 then
     # get file name
-    fileName=$(basename $localPath)
+    fileName="$(basename "$localPath")"
 
-    # get upload url
-    nexusUploadUrl="${nexusUrl}/repository/${repositoryName}${targetPath}/$fileName"
+    # get remote path
+    remotePath="$targetPath/$fileName"
 
     # upload file to nexus repository manager server
-    uploadFile "$username" "$password" "$localPath" "$nexusUploadUrl"
+    uploadFile "$username" "$password" "$localPath" "$remotePath" "$repositoryName" "$nexusUrl"
 else
     # if local path is a folder
     if [ -d "$localPath" ]
     then
-        find "$localPath" -name '*' -type f | while read filePath
+        find "$localPath" -name '*' -type f | while read currentLocalPath
         do 
-            # get file name
-            fileName=$(basename $filePath)
-
             # get relative path to file
-            relativePath="$(echo $filePath | sed -r "s|$localPath||g")"
+            relativePath="$(echo "$currentLocalPath" | sed -r "s|$localPath||g")"
 
-            # get upload url
-            nexusUploadUrl="${nexusUrl}/repository/${repositoryName}${targetPath}${relativePath}"
+            # get remote path
+            remotePath="${targetPath}${relativePath}"
 
             # upload file to nexus repository manager server
-            uploadFile "$username" "$password" "$filePath" "$nexusUploadUrl"    
+            uploadFile "$username" "$password" "$currentLocalPath" "$remotePath" "$repositoryName" "$nexusUrl"
         done
     fi
 fi
