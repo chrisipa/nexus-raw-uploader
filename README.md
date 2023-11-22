@@ -21,6 +21,7 @@ Simple bash script to upload local files or folders to a Nexus RAW Repository:
      -p <password>     Password of the nexus repository manager server (will be asked if not present)
      -t <target path>  The target path to upload to (default is empty, must start with '/') 
                        The target path does not have to exist (if not existing it is created)
+     -c                Continue in case of errors
      -h                Show this help text
    
    Examples:
